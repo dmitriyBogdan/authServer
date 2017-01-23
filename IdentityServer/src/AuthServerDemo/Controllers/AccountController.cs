@@ -19,6 +19,7 @@ using AuthServerDemo.Attributes;
 using IdentityServer4;
 using AuthServerDemo.Data.Entities;
 using Microsoft.Extensions.Logging;
+using AuthServerDemo.Data.Stores;
 
 namespace AuthServerDemo.Controllers
 {
@@ -36,18 +37,23 @@ namespace AuthServerDemo.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> singInManager;
 
+        private readonly IApplicationUserStore userStore;
+
         public AccountController(
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IHttpContextAccessor httpContextAccessor,
             UserManager<ApplicationUser> identityUserManager,
-            SignInManager<ApplicationUser> identitySingInManager)
+            SignInManager<ApplicationUser> identitySingInManager,
+            IApplicationUserStore appUserStore)
         {
             _interaction = interaction;
             _account = new AccountService(interaction, httpContextAccessor, clientStore);
 
             this.userManager = identityUserManager;
             this.singInManager = identitySingInManager;
+
+            this.userStore = appUserStore;
         }
 
         /// <summary>
@@ -76,11 +82,25 @@ namespace AuthServerDemo.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await singInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: false);
+                var validationResult = await this.userStore.ValidateCredentialsAsync(model.Username, model.Password);
 
-                if (result.Succeeded)
+                if (validationResult)
                 {
-                    return RedirectToLocal(model.ReturnUrl);
+                    AuthenticationProperties props = null;
+
+                    if (AccountOptions.AllowRememberLogin && model.RememberLogin)
+                    {
+                        props = new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
+                        };
+                    };
+
+                    var user = await this.userStore.FindByUsernameAsync(model.Username);
+                    await HttpContext.Authentication.SignInAsync(user.Id.ToString(), user.UserName, props);
+
+                    return Redirect(model.ReturnUrl);
                 }
                 else
                 {

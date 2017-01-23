@@ -3,3 +3,8 @@
 /IdentityServer/src/AuthServerDemo/Properties/*
 /IdentityServer/.vs/*
 *.user
+
+/IdentityServer/src/ClientApp/bin/*
+/IdentityServer/src/ClientApp/obj/*
+/IdentityServer/src/ClientApp/Properties/*
+*.lock.json
