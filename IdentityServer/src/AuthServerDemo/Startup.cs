@@ -112,8 +112,6 @@ namespace AuthServerDemo
                 AutomaticChallenge = false
             });
 
-            app.UseFacebook(Configuration);
-
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             app.UseIdentityAuthentication(Configuration);
 
