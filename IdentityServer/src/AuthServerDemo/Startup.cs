@@ -21,6 +21,7 @@ using IdentityServer4.Validation;
 using AuthServerDemo.Data.Repository;
 using IdentityServer4.Stores;
 using AuthServerDemo.Data.Stores;
+using AuthServerDemo.Data.Repository.InAppMemoryRepository;
 
 namespace AuthServerDemo
 {
@@ -69,14 +70,21 @@ namespace AuthServerDemo
 
             services.AddMvc();
 
-            services.AddTransient<IProfileService, ApplicationUserProfileService>();
-            services.AddTransient<IResourceOwnerPasswordValidator, ApplicationUserPasswordValidator>();
-
-            services.AddSingleton(new RedisConnection(Configuration.GetSection("Redis:Host").Value));
-            services.AddTransient<IApplicationUserRepository, ApplicationUserRedisRepository>();
-            services.AddTransient<IGrantRepository, GrantRedisRepository>();
+            if (bool.Parse(Configuration.GetSection("Redis:Enable").Value))
+            {
+                services.AddSingleton(new RedisConnection(Configuration.GetSection("Redis:Host").Value));
+                services.AddTransient<IApplicationUserRepository, ApplicationUserRedisRepository>();
+                services.AddTransient<IGrantRepository, GrantRedisRepository>();
+            }
+            else
+            {
+                services.AddSingleton<IApplicationUserRepository, InAppMemoryUserRepository>();
+                services.AddSingleton<IGrantRepository, InAppMemoryGrantRepository>();
+            }
 
             services.AddTransient<IPersistedGrantStore, PersistedGrantRedisStore>();
+            services.AddTransient<IProfileService, ApplicationUserProfileService>();
+            services.AddTransient<IResourceOwnerPasswordValidator, ApplicationUserPasswordValidator>();
 
             services.AddIdentityServer()
                 .AddTemporarySigningCredential()
@@ -90,7 +98,7 @@ namespace AuthServerDemo
         {
             loggerFactory.AddConsole();
 
-            app.CopyUsersFromDatabaseToRedis();
+            app.CopyUsersFromDatabase();
 
             if (env.IsDevelopment())
             {

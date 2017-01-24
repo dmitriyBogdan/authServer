@@ -8,7 +8,7 @@ namespace AuthServerDemo.Initialization
 {
     public static class ApplicationUserInitializationExtensions
     {
-        public static void CopyUsersFromDatabaseToRedis(this IApplicationBuilder app)
+        public static void CopyUsersFromDatabase(this IApplicationBuilder app)
         {
             var userRepository = app.ApplicationServices.GetService<IApplicationUserRepository>();
             var identityUserSotore = app.ApplicationServices.GetService<UserManager<ApplicationUser>>();

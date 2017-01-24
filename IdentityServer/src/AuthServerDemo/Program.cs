@@ -18,7 +18,7 @@ namespace AuthServerDemo
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseConfiguration(configuration) // --server.urls = http://localhost:5001/
+                .UseConfiguration(configuration) // --server.urls=http://localhost:5001/
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();

@@ -7,21 +7,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthServerDemo.Data.Repository
 {
-    public interface IApplicationUserRepository
-    {
-        Task AddAsync(ApplicationUser user);
-
-        Task AddRangeAsync(IEnumerable<ApplicationUser> users);
-
-        Task UpdateAsync(ApplicationUser user);
-
-        Task DeleteAsync(ApplicationUser user);
-
-        Task<ApplicationUser> GetByIdAsync(int id);
-
-        Task<ApplicationUser> GetByUserNameAsync(string userName);
-    }
-
     public class ApplicationUserRedisRepository : IApplicationUserRepository
     {
         private const string KEY_ID_SUFFIX = "USER_ID_";
