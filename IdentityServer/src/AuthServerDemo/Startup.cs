@@ -89,7 +89,7 @@ namespace AuthServerDemo
                 // Adds singleton connection for Redis. Needs to be executed once as far as this is heavy operation
                 services.AddSingleton(new RedisConnection(Configuration.GetSection("Redis:Host").Value));
 
-                // If Redis:Enable == false we will store data in application memory
+                // Registration for Redis store implementation 
                 services.AddTransient<IApplicationUserRepository, ApplicationUserRedisRepository>();
                 services.AddTransient<IGrantRepository, GrantRedisRepository>();
             }

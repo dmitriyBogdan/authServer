@@ -8,3 +8,4 @@
 /IdentityServer/src/ClientApp/obj/*
 /IdentityServer/src/ClientApp/Properties/*
 *.lock.json
+/IdentityServer/src/AuthServerDemo/auth.pfx
