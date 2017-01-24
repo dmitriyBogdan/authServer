@@ -4,8 +4,8 @@ Steps to run solution:
 * Install .Net Core v.1.1.0 https://www.microsoft.com/net/core#macos
 * Clone https://github.com/yevheniiyankovyi/authServer 
 * Switch to branch: demo and pull latest changes
-* Navigate to ~\authServer\IdentityServer\src
-* Substitute appsettings.json with one file we have emailed you
+* Navigate to ~\authServer\IdentityServer\src\AuthServerDemo
+* Execute in cmd: dotnet restore
 * Execute in cmd: dotnet run
 
 * Open in web browser http://localhost:5000/.well-known/openid-configuration and you should be able to see discovery document
