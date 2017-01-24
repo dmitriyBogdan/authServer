@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace AuthServerDemo.Data.Repository
 {
+    /// <summary>
+    /// Persisted grant data access point for redis database 
+    /// </summary>
     public class GrantRedisRepository : IGrantRepository
     {
         private const string TOKEN = "TOKEN";

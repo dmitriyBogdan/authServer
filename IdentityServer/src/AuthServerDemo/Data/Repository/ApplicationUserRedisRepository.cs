@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthServerDemo.Data.Repository
 {
+    /// <summary>
+    /// User data access point for redis database
+    /// </summary>
     public class ApplicationUserRedisRepository : IApplicationUserRepository
     {
         private const string KEY_ID_SUFFIX = "USER_ID_";

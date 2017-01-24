@@ -5,17 +5,9 @@ using AuthServerDemo.Data.Repository;
 
 namespace AuthServerDemo.Data.Stores
 {
-    public interface IApplicationUserStore
-    {
-        IApplicationUserRepository UsersRepository { get; }
-
-        Task<bool> ValidateCredentialsAsync(string username, string password);
-
-        Task<ApplicationUser> FindByUsernameAsync(string username);
-
-        Task<ApplicationUser> FindByIdAsync(int id);
-    }
-
+    /// <summary>
+    /// Provides methods to search user and public userRepository with full CRUD functionality.
+    /// </summary>
     public class ApplicationUserStore : IApplicationUserStore
     {
         protected internal IPasswordHasher<ApplicationUser> PasswordHasher { get; set; }

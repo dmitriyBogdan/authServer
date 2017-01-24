@@ -1,11 +1,10 @@
 ﻿using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AuthServerDemo.Data
 {
+    /// <summary>
+    /// Represents Redis connection
+    /// </summary>
     public class RedisConnection
     {
         public IDatabase Database { get; private set; }
