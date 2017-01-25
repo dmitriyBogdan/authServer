@@ -21,6 +21,7 @@ using IdentityServer4.Stores;
 using AuthServerDemo.Data.Stores;
 using AuthServerDemo.Data.Repository.InAppMemoryRepository;
 using Microsoft.AspNetCore.Http;
+using AuthServerDemo.Services.Interfaces;
 
 namespace AuthServerDemo
 {
@@ -104,6 +105,7 @@ namespace AuthServerDemo
             //Registration of custom implementation of interfaces that going to be injected and used during application execution
             //services.AddTransient<IPersistedGrantStore, PersistedGrantRedisStore>();
             services.AddTransient<IProfileService, IdentityProfileService>();
+            services.AddTransient<IClientService, ClientService>();
             //services.AddTransient<IResourceOwnerPasswordValidator, ApplicationUserPasswordValidator>();
 
             //Specification that IdentityServer going to be used with registration of required services

@@ -3,11 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AuthServerDemo.Models.Client
 {
-    public class ClientModel
+    public class RegisterClientModel
     {
-        public string ClientId { get; set; }
-
-        [Required]
         public string ClientName { get; set; }
 
         public string Secret { get; set; }
@@ -18,7 +15,8 @@ namespace AuthServerDemo.Models.Client
         [Required]
         public string LogOutRedirectUri { get; set; }
 
-        public IEnumerable<string> GrantTypes { get; set; }
+        [Required]
+        public string GrantType { get; set; }
 
         public IEnumerable<string> AllowedScopes { get; set; }
     }

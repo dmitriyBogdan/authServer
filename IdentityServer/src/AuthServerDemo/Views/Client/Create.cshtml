@@ -1,0 +1,12 @@
+﻿@using AuthServerDemo.Models.Client
+
+@model ClientModel
+
+<form asp-controller="client" asp-action="create" method="post">
+
+    <input asp-for="ClientName" />
+    <input asp-for="RedirectUri" />
+    <input asp-for="LogOutRedirectUri" />
+
+    <button type="submit">Create</button>
+</form>
