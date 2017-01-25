@@ -136,7 +136,7 @@ namespace AuthServerDemo
             loggerFactory.AddConsole();
 
             // Copy user information from PostgreSQL database in to redis on application start
-            app.CopyUsersFromDatabase();
+            // app.CopyUsersFromDatabase();
 
             if (env.IsDevelopment())
             {

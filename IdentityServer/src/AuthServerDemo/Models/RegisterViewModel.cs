@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AuthServerDemo.Models.UserProfile;
 
 namespace AuthServerDemo.Models
 {
-    public class RegisterViewModel
+    public class RegisterViewModel : UserProfileModel
     {
         [Required]
         [EmailAddress]

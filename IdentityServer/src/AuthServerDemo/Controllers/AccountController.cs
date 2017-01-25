@@ -38,18 +38,14 @@ namespace AuthServerDemo.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
 
-        private readonly IApplicationUserStore userStore;
-
         public AccountController(IIdentityServerInteractionService interaction, IClientStore clientStore, IHttpContextAccessor httpContextAccessor,
-            UserManager<ApplicationUser> identityUserManager, SignInManager<ApplicationUser> identitySignInManager, IApplicationUserStore appUserStore)
+            UserManager<ApplicationUser> identityUserManager, SignInManager<ApplicationUser> identitySignInManager)
         {
             _interaction = interaction;
             _account = new AccountService(interaction, httpContextAccessor, clientStore);
 
             this.userManager = identityUserManager;
             this.signInManager = identitySignInManager;
-
-            this.userStore = appUserStore;
         }
 
         [HttpGet]
@@ -69,11 +65,25 @@ namespace AuthServerDemo.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                    {
+                        UserName = model.Email,
+                        Email = model.Email,
+                        Address = model.Address,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName
+                    };
+
                 var result = await userManager.CreateAsync(user, model.Password);
+
                 if (result.Succeeded)
                 {
                     await signInManager.SignInAsync(user, isPersistent: false);
+
+                    if (string.IsNullOrWhiteSpace(returnUrl))
+                    {
+                        return RedirectToAction(nameof(HomeController.Index), "Home");
+                    }
 
                     return RedirectToLocal(returnUrl);
                 }
@@ -82,7 +92,6 @@ namespace AuthServerDemo.Controllers
 
             return View(model);
         }
-
 
         /// <summary>
         /// Show login page
@@ -110,23 +119,14 @@ namespace AuthServerDemo.Controllers
         {
             if (ModelState.IsValid)
             {
-                var validationResult = await this.userStore.ValidateCredentialsAsync(model.Username, model.Password);
+                var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: false);
 
-                if (validationResult)
+                if (result.Succeeded)
                 {
-                    AuthenticationProperties props = null;
-
-                    if (AccountOptions.AllowRememberLogin && model.RememberLogin)
+                    if (string.IsNullOrWhiteSpace(model.ReturnUrl))
                     {
-                        props = new AuthenticationProperties
-                        {
-                            IsPersistent = true,
-                            ExpiresUtc = DateTimeOffset.UtcNow.Add(AccountOptions.RememberMeLoginDuration)
-                        };
-                    };
-
-                    var user = await this.userStore.FindByUsernameAsync(model.Username);
-                    await HttpContext.Authentication.SignInAsync(user.Id.ToString(), user.UserName, props);
+                        return RedirectToAction(nameof(HomeController.Index), "Home");
+                    }
 
                     return Redirect(model.ReturnUrl);
                 }
