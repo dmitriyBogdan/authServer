@@ -20,6 +20,7 @@ using IdentityServer4;
 using AuthServerDemo.Data.Entities;
 using Microsoft.Extensions.Logging;
 using AuthServerDemo.Data.Stores;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuthServerDemo.Controllers
 {
@@ -35,26 +36,53 @@ namespace AuthServerDemo.Controllers
         private readonly AccountService _account;
 
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> singInManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
 
         private readonly IApplicationUserStore userStore;
 
-        public AccountController(
-            IIdentityServerInteractionService interaction,
-            IClientStore clientStore,
-            IHttpContextAccessor httpContextAccessor,
-            UserManager<ApplicationUser> identityUserManager,
-            SignInManager<ApplicationUser> identitySingInManager,
-            IApplicationUserStore appUserStore)
+        public AccountController(IIdentityServerInteractionService interaction, IClientStore clientStore, IHttpContextAccessor httpContextAccessor,
+            UserManager<ApplicationUser> identityUserManager, SignInManager<ApplicationUser> identitySignInManager, IApplicationUserStore appUserStore)
         {
             _interaction = interaction;
             _account = new AccountService(interaction, httpContextAccessor, clientStore);
 
             this.userManager = identityUserManager;
-            this.singInManager = identitySingInManager;
+            this.signInManager = identitySignInManager;
 
             this.userStore = appUserStore;
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Register(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        // POST: /Account/Register
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var result = await userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await signInManager.SignInAsync(user, isPersistent: false);
+
+                    return RedirectToLocal(returnUrl);
+                }
+                AddErrors(result);
+            }
+
+            return View(model);
+        }
+
 
         /// <summary>
         /// Show login page
@@ -110,6 +138,15 @@ namespace AuthServerDemo.Controllers
 
             var loginViewModel = await _account.BuildLoginViewModelAsync(model);
             return View(loginViewModel);
+        }
+
+        // POST: /Account/LogOff
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogOff()
+        {
+            await signInManager.SignOutAsync();
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         /// <summary>
@@ -215,14 +252,14 @@ namespace AuthServerDemo.Controllers
                 return View(nameof(Login));
             }
 
-            var info = await singInManager.GetExternalLoginInfoAsync();
+            var info = await signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 return RedirectToAction(nameof(Login));
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await singInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
             if (result.Succeeded)
             {
                 return RedirectToLocal(returnUrl);
@@ -250,6 +287,14 @@ namespace AuthServerDemo.Controllers
             else
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
             }
         }
     }

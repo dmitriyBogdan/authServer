@@ -86,7 +86,7 @@ namespace AuthServerDemo
             // If Redis:Enable == false we will store data in application memory
             if (bool.Parse(Configuration["Redis:Enable"]))
             {
-                
+
                 // Adds singleton connection for Redis. Needs to be executed once as far as this is heavy operation
                 services.AddSingleton(new RedisConnection(Configuration["Redis:Host"]));
 
@@ -97,35 +97,31 @@ namespace AuthServerDemo
             else
             {
                 // Registration for InMemory store implementation 
-                services.AddSingleton<IApplicationUserRepository, InAppMemoryUserRepository>();
-                services.AddSingleton<IGrantRepository, InAppMemoryGrantRepository>();
+                //services.AddSingleton<IApplicationUserRepository, InAppMemoryUserRepository>();
+                //services.AddSingleton<IGrantRepository, InAppMemoryGrantRepository>();
             }
 
             //Registration of custom implementation of interfaces that going to be injected and used during application execution
-            services.AddTransient<IPersistedGrantStore, PersistedGrantRedisStore>();
-            services.AddTransient<IProfileService, ApplicationUserProfileService>();
-            services.AddTransient<IResourceOwnerPasswordValidator, ApplicationUserPasswordValidator>();
+            //services.AddTransient<IPersistedGrantStore, PersistedGrantRedisStore>();
+            services.AddTransient<IProfileService, IdentityProfileService>();
+            //services.AddTransient<IResourceOwnerPasswordValidator, ApplicationUserPasswordValidator>();
 
             //Specification that IdentityServer going to be used with registration of required services
             services.AddIdentityServer()
                 // Adding signing keys, this method will generate RSA keys
                 .AddTemporarySigningCredential()
-                // Adding allowed resources store (Using predefined data just for demo purposes)
-                .AddInMemoryIdentityResources(FakeDataConfig.GetIdentityResources())
-                .AddInMemoryApiResources(FakeDataConfig.GetApiResources())
-                // Adding clients store (Using predefined data just for demo purposes)
-                .AddInMemoryClients(FakeDataConfig.GetClients())
-                // Adding user store
-                .ManageApplicationUsers();
+                .AddConfigurationStore(builder =>
+                    builder.UseNpgsql(connectionString, options =>
+                        options.MigrationsAssembly(migrationAssembly)))
 
-            //This is how IdentityServer can be configured to read resources and clients from PostgreSQL database 
-            //    .AddConfigurationStore(builder =>
-            //        builder.UseNpgsql(connectionString, options =>
-            //            options.MigrationsAssembly(migrationAssembly)))
+                .AddOperationalStore(builder =>
+                    builder.UseNpgsql(connectionString, options =>
+                        options.MigrationsAssembly(migrationAssembly)))
 
-            //    .AddOperationalStore(builder =>
-            //        builder.UseNpgsql(connectionString, options =>
-            //            options.MigrationsAssembly(migrationAssembly)))
+                 .AddAspNetIdentity<ApplicationUser>()
+                 .AddProfileService<IdentityProfileService>();
+            // Adding user store
+            //.ManageApplicationUsers();
         }
 
         /// <summary>

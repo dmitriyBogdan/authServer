@@ -14,18 +14,18 @@ namespace AuthServerDemo.Initialization
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
-                //serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
 
                 serviceScope.ServiceProvider.GetRequiredService<AuthorizationServerDbContext>().Database.Migrate();
 
-                //var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
 
-                //context.Database.Migrate();
+                context.Database.Migrate();
 
-                //if (createTestData)
-                //{
-                //    context.InitializeTestData();
-                //}
+                if (createTestData)
+                {
+                    context.InitializeTestData();
+                }
             }
         }
 
