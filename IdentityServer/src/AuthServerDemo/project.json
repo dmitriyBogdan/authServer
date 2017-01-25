@@ -20,6 +20,7 @@
     "Microsoft.Extensions.Configuration.Json": "1.1.0",
     "Microsoft.AspNetCore.Authentication.Cookies": "1.1.0",
     "Microsoft.AspNetCore.Authentication.Facebook": "1.1.0",
+    "Microsoft.AspNetCore.Authentication.Google": "1.1.0",
     "IdentityServer4.AspNetIdentity": "1.0.0",
     "IdentityServer4.EntityFramework": "1.0.0",
     "Npgsql.EntityFrameworkCore.PostgreSQL": "1.0.0",

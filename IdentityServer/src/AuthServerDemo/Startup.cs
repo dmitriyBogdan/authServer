@@ -20,6 +20,7 @@ using AuthServerDemo.Data.Repository;
 using IdentityServer4.Stores;
 using AuthServerDemo.Data.Stores;
 using AuthServerDemo.Data.Repository.InAppMemoryRepository;
+using Microsoft.AspNetCore.Http;
 
 namespace AuthServerDemo
 {
@@ -83,11 +84,11 @@ namespace AuthServerDemo
 
             // If Redis:Enable == true we will store data in Redis
             // If Redis:Enable == false we will store data in application memory
-            if (bool.Parse(Configuration.GetSection("Redis:Enable").Value))
+            if (bool.Parse(Configuration["Redis:Enable"]))
             {
                 
                 // Adds singleton connection for Redis. Needs to be executed once as far as this is heavy operation
-                services.AddSingleton(new RedisConnection(Configuration.GetSection("Redis:Host").Value));
+                services.AddSingleton(new RedisConnection(Configuration["Redis:Host"]));
 
                 // Registration for Redis store implementation 
                 services.AddTransient<IApplicationUserRepository, ApplicationUserRedisRepository>();
@@ -166,6 +167,34 @@ namespace AuthServerDemo
                 AutomaticAuthenticate = false,
                 AutomaticChallenge = false
             });
+
+            app.UseGoogleAuthentication(new GoogleOptions
+            {
+                AuthenticationScheme = "Google",
+                DisplayName = "Google",
+                SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme,
+
+                ClientId = "434483408261-55tc8n0cs4ff1fe21ea8df2o443v2iuc.apps.googleusercontent.com",
+                ClientSecret = "3gcoTrEDPPJ0ukn_aYYT6PWo"
+            });
+
+            app.UseOAuthAuthentication(new OAuthOptions
+            {
+                AuthenticationScheme = "LinkedIn",
+                DisplayName = "LinkedIn",
+                ClientId = "75xcbb4icwltx3",
+                ClientSecret = "giSng0gfq81DTUzZ",
+
+                CallbackPath = new PathString("/signin-linkedin"),
+
+                AuthorizationEndpoint = "https://www.linkedin.com/oauth/v2/authorization",
+                TokenEndpoint = "https://www.linkedin.com/oauth/v2/accessToken",
+                UserInformationEndpoint = "https://api.linkedin.com/v1/people/~:(id,formatted-name,email-address,picture-url)",
+
+                Scope = { "r_basicprofile", "r_emailaddress" },
+            });
+
+            app.UseFacebook(Configuration);
 
             // Clears default claim types mapping 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
