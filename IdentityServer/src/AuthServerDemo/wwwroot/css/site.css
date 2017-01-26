@@ -49,3 +49,7 @@
   float: right;
   color: red;
 }
+.navigationLink {
+  float: right;
+  margin-bottom: 10px;
+}

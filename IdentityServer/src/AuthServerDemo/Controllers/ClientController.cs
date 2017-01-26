@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace AuthServerDemo.Controllers
 {
     [SecurityHeaders]
-    //[Authorize(Roles.Admin)]
+    [Authorize(Roles.Admin)]
     public class ClientController : Controller
     {
         private readonly IClientService clientService;
