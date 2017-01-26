@@ -342,10 +342,11 @@ namespace AuthServerDemo.Controllers
                 }
             }
 
+            var first = filtered.FirstOrDefault(x => x.Type == JwtClaimTypes.GivenName)?.Value;
+            var last = filtered.FirstOrDefault(x => x.Type == JwtClaimTypes.FamilyName)?.Value;
+
             if (!filtered.Any(x => x.Type == JwtClaimTypes.Name))
             {
-                var first = filtered.FirstOrDefault(x => x.Type == JwtClaimTypes.GivenName)?.Value;
-                var last = filtered.FirstOrDefault(x => x.Type == JwtClaimTypes.FamilyName)?.Value;
                 if (first != null && last != null)
                 {
                     filtered.Add(new Claim(JwtClaimTypes.Name, first + " " + last));
@@ -361,12 +362,12 @@ namespace AuthServerDemo.Controllers
             }
 
             var email = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
-            var fullName = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value.Split(' ');
+
             var newUser = new ApplicationUser()
             {
                 UserName = email,
-                FirstName = fullName[0],
-                LastName = fullName[1],
+                FirstName = first,
+                LastName = last,
                 Email = email,
                 ProviderName = provider,
                 ProviderSubjectId = userId
