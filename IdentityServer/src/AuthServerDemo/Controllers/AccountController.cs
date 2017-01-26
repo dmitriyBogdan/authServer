@@ -182,8 +182,7 @@ namespace AuthServerDemo.Controllers
                 try
                 {
                     // hack: try/catch to handle social providers that throw
-                    await HttpContext.Authentication.SignOutAsync(logedOutModel.ExternalAuthenticationScheme, 
-                        new AuthenticationProperties { RedirectUri = url });
+                    await HttpContext.Authentication.SignOutAsync(logedOutModel.ExternalAuthenticationScheme, new AuthenticationProperties { RedirectUri = url });
                 }
                 catch(NotSupportedException) // this is for the external providers that don't have signout
                 {
@@ -365,9 +364,9 @@ namespace AuthServerDemo.Controllers
             var name = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value;
             var newUser = new ApplicationUser()
             {
-                UserName = name
-                //ProviderName = provider,
-                //ProviderSubjectId = userId
+                UserName = name,
+                ProviderName = provider,
+                ProviderSubjectId = userId
             };
 
             foreach (var claim in filtered)

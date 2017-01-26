@@ -77,6 +77,10 @@ namespace AuthServerDemo.Data.Migrations.IdentityServer.AuthServerDemo
 
                     b.Property<bool>("PhoneNumberConfirmed");
 
+                    b.Property<string>("ProviderName");
+
+                    b.Property<string>("ProviderSubjectId");
+
                     b.Property<string>("SecurityStamp");
 
                     b.Property<bool>("TwoFactorEnabled");
