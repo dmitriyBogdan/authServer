@@ -42,3 +42,6 @@
 .page-consent .consent-form .consent-remember {
   padding-left: 16px;
 }
+.dropdown {
+  height: 35px;
+}
