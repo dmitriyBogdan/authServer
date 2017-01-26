@@ -269,8 +269,7 @@ namespace AuthServerDemo.Controllers
             var provider = info.Properties.Items["scheme"];
             var userId = userIdClaim.Value;
 
-            //var user = this.userManager.Users.FirstOrDefault(q => q.ProviderName == provider && q.ProviderSubjectId == userId);
-            var user = this.userManager.Users.FirstOrDefault(q => true);
+            var user = this.userManager.Users.FirstOrDefault(q => q.ProviderName == provider && q.ProviderSubjectId == userId);
 
             if (user == null)
             {
