@@ -64,7 +64,13 @@ namespace ClientApp
                 Authority = "http://localhost:5000",
                 RequireHttpsMetadata = false,
 
-                ClientId = "mvc",
+                ClientId = "rfClient",
+                ClientSecret = "secret",
+
+                ResponseType = "code id_token",
+                Scope = { "api1", "offline_access", "users" },
+
+                GetClaimsFromUserInfoEndpoint = true,
                 SaveTokens = true
             });
 

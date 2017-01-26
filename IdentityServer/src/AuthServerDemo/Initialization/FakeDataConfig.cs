@@ -128,6 +128,29 @@ namespace AuthServerDemo.Initialization
                         "userscope",
                         "role"
                     }
+                },
+                new Client
+                {
+                        ClientId = "rfClient",
+                        ClientName = "Refresh token test",
+                        AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
+
+                        ClientSecrets =
+                        {
+                            new Secret("secret".Sha256())
+                        },
+
+                        RedirectUris           = { "http://localhost:5001/signin-oidc" },
+                        PostLogoutRedirectUris = { "http://localhost:5001" },
+
+                        AllowedScopes =
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile,
+                            "api1",
+                            "users"
+                        },
+                        AllowOfflineAccess = true
                 }
             };
         }

@@ -14,17 +14,10 @@ namespace ClientApp.Controllers
             return View();
         }
 
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
         [Authorize]
-        public IActionResult Contact()
+        public IActionResult Secret()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = "Here is your secret info";
 
             return View();
         }

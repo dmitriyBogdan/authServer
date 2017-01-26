@@ -174,22 +174,6 @@ namespace AuthServerDemo
                 ClientSecret = "3gcoTrEDPPJ0ukn_aYYT6PWo"
             });
 
-            app.UseOAuthAuthentication(new OAuthOptions
-            {
-                AuthenticationScheme = "LinkedIn",
-                DisplayName = "LinkedIn",
-                ClientId = "75xcbb4icwltx3",
-                ClientSecret = "giSng0gfq81DTUzZ",
-
-                CallbackPath = new PathString("/signin-linkedin"),
-
-                AuthorizationEndpoint = "https://www.linkedin.com/oauth/v2/authorization",
-                TokenEndpoint = "https://www.linkedin.com/oauth/v2/accessToken",
-                UserInformationEndpoint = "https://api.linkedin.com/v1/people/~:(id,formatted-name,email-address,picture-url)",
-
-                Scope = { "r_basicprofile", "r_emailaddress" },
-            });
-
             app.UseFacebook(Configuration);
 
             // Clears default claim types mapping 

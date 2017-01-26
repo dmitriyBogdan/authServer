@@ -11,5 +11,9 @@ namespace AuthServerDemo.Data.Entities
         public string Address { get; set; }
         
         public bool IsAdmin { get; set; }
+
+        //public string ProviderName { get; set; }
+
+        //public string ProviderSubjectId { get; set; }
     }
 }

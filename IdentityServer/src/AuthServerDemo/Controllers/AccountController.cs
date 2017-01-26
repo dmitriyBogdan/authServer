@@ -21,6 +21,8 @@ using AuthServerDemo.Data.Entities;
 using Microsoft.Extensions.Logging;
 using AuthServerDemo.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace AuthServerDemo.Controllers
 {
@@ -224,18 +226,17 @@ namespace AuthServerDemo.Controllers
                 }
                 else
                 {
-                    // this triggers all of the windows auth schemes we're supporting so the browser can use what it supports
                     return new ChallengeResult(AccountOptions.WindowsAuthenticationSchemes);
                 }
             }
             else
             {
-                // start challenge and roundtrip the return URL
                 var props = new AuthenticationProperties
                 {
                     RedirectUri = returnUrl,
                     Items = { { "scheme", provider } }
                 };
+
                 return new ChallengeResult(provider, props);
             }
         }
@@ -246,36 +247,61 @@ namespace AuthServerDemo.Controllers
         [HttpGet]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
         {
-            if (remoteError != null)
+            var info = await HttpContext.Authentication.GetAuthenticateInfoAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            var tempUser = info?.Principal;
+            if (tempUser == null)
             {
-                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
-                return View(nameof(Login));
+                throw new Exception("External authentication error");
             }
 
-            var info = await signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
+            var claims = tempUser.Claims.ToList();
+
+            var userIdClaim = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.Subject);
+            if (userIdClaim == null)
             {
-                return RedirectToAction(nameof(Login));
+                userIdClaim = claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            }
+            if (userIdClaim == null)
+            {
+                throw new Exception("Unknown userid");
             }
 
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
-            if (result.Succeeded)
+            claims.Remove(userIdClaim);
+            var provider = info.Properties.Items["scheme"];
+            var userId = userIdClaim.Value;
+
+            //var user = this.userManager.Users.FirstOrDefault(q => q.ProviderName == provider && q.ProviderSubjectId == userId);
+            var user = this.userManager.Users.FirstOrDefault(q => true);
+
+            if (user == null)
             {
-                return RedirectToLocal(returnUrl);
+                user = await this.AutoProvisionUserAsync(provider, userId, claims);
             }
-            if (result.IsLockedOut)
+
+            var additionalClaims = new List<Claim>();
+            var sid = claims.FirstOrDefault(x => x.Type == JwtClaimTypes.SessionId);
+            if (sid != null)
             {
-                return View("Lockout");
+                additionalClaims.Add(new Claim(JwtClaimTypes.SessionId, sid.Value));
             }
-            else
+
+            AuthenticationProperties props = null;
+            var id_token = info.Properties.GetTokenValue("id_token");
+            if (id_token != null)
             {
-                // If the user does not have an account, then ask the user to create an account.
-                ViewData["ReturnUrl"] = returnUrl;
-                ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
+                props = new AuthenticationProperties();
+                props.StoreTokens(new[] { new AuthenticationToken { Name = "id_token", Value = id_token } });
             }
+
+            await HttpContext.Authentication.SignInAsync(user.Id.ToString(), user.UserName, provider, props, additionalClaims.ToArray());
+            await HttpContext.Authentication.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+
+            if (_interaction.IsValidReturnUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return Redirect("~/");
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -296,6 +322,70 @@ namespace AuthServerDemo.Controllers
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
+        }
+
+        private async Task<ApplicationUser> AutoProvisionUserAsync(string provider, string userId, List<Claim> claims)
+        {
+            var filtered = new List<Claim>();
+
+            foreach (var claim in claims)
+            {
+                if (claim.Type == ClaimTypes.Name)
+                {
+                    filtered.Add(new Claim(JwtClaimTypes.Name, claim.Value));
+                }
+                else if (JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.ContainsKey(claim.Type))
+                {
+                    filtered.Add(new Claim(JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap[claim.Type], claim.Value));
+                }
+                else
+                {
+                    filtered.Add(claim);
+                }
+            }
+
+            if (!filtered.Any(x => x.Type == JwtClaimTypes.Name))
+            {
+                var first = filtered.FirstOrDefault(x => x.Type == JwtClaimTypes.GivenName)?.Value;
+                var last = filtered.FirstOrDefault(x => x.Type == JwtClaimTypes.FamilyName)?.Value;
+                if (first != null && last != null)
+                {
+                    filtered.Add(new Claim(JwtClaimTypes.Name, first + " " + last));
+                }
+                else if (first != null)
+                {
+                    filtered.Add(new Claim(JwtClaimTypes.Name, first));
+                }
+                else if (last != null)
+                {
+                    filtered.Add(new Claim(JwtClaimTypes.Name, last));
+                }
+            }
+
+            var name = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value;
+            var newUser = new ApplicationUser()
+            {
+                UserName = name
+                //ProviderName = provider,
+                //ProviderSubjectId = userId
+            };
+
+            foreach (var claim in filtered)
+            {
+                newUser.Claims.Add(new IdentityUserClaim<int>() {
+                    ClaimType = claim.Type,
+                    ClaimValue = claim.Value
+                });
+            }
+
+            var user = await this.userManager.CreateAsync(newUser);
+
+            if (user.Succeeded)
+            {
+                return newUser;
+            }
+
+            throw new Exception("Provision user failed");
         }
     }
 }

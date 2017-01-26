@@ -51,20 +51,6 @@ namespace AuthServerDemo.Services
                     AuthenticationScheme = x.AuthenticationScheme
                 }).ToList();
 
-            if (AccountOptions.WindowsAuthenticationEnabled)
-            {
-                // this is needed to handle windows auth schemes
-                var windowsSchemes = schemes.Where(s => AccountOptions.WindowsAuthenticationSchemes.Contains(s.AuthenticationScheme));
-                if (windowsSchemes.Any())
-                {
-                    providers.Add(new ExternalProvider
-                    {
-                        AuthenticationScheme = AccountOptions.WindowsAuthenticationSchemes.First(),
-                        DisplayName = AccountOptions.WindowsAuthenticationDisplayName
-                    });
-                }
-            }
-
             var allowLocal = true;
             if (context?.ClientId != null)
             {
