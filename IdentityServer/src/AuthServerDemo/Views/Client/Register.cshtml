@@ -1,0 +1,58 @@
+﻿@using AuthServerDemo.Models.Client
+
+@model RegisterClientModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>@ViewData["Title"].</h2>
+
+<form asp-controller="Client" asp-action="Register" method="post" class="form-horizontal">
+
+    <h4>Create a new cient.</h4>
+    <hr />
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="ClientName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="ClientName" class="form-control" />
+            <span asp-validation-for="ClientName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Secret" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Secret" class="form-control" />
+            <span asp-validation-for="Secret" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="RedirectUri" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="RedirectUri" class="form-control" />
+            <span asp-validation-for="RedirectUri" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LogOutRedirectUri" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="LogOutRedirectUri" class="form-control" />
+            <span asp-validation-for="LogOutRedirectUri" class="text-danger"></span>
+        </div>
+    </div>
+
+    <select asp-for="GrantType" asp-items="Model.GrantTypes"></select>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default">Register</button>
+        </div>
+    </div>
+
+</form>

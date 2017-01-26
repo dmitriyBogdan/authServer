@@ -21,24 +21,23 @@ namespace AuthServerDemo.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Create()
+        public IActionResult Register()
         {
-            return View();
+            return View(new RegisterClientModel());
         }
 
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RegisterClientModel client)
+        public async Task<IActionResult> Register(RegisterClientModel client)
         {
             if (ModelState.IsValid)
             {
-                await clientService.CreateAsync(client);
+                var savedClient = await clientService.CreateAsync(client);
 
                 RedirectToAction(nameof(ProfileInfo));
             }
 
-            // IdentityServer4.Models.GrantTypes
             return View(client);
         }
 
