@@ -21,6 +21,7 @@ using IdentityServer4.Stores;
 using AuthServerDemo.Data.Stores;
 using AuthServerDemo.Data.Repository.InAppMemoryRepository;
 using Microsoft.AspNetCore.Http;
+using AuthServerDemo.Services.Interfaces;
 
 namespace AuthServerDemo
 {
@@ -104,6 +105,7 @@ namespace AuthServerDemo
             //Registration of custom implementation of interfaces that going to be injected and used during application execution
             //services.AddTransient<IPersistedGrantStore, PersistedGrantRedisStore>();
             services.AddTransient<IProfileService, IdentityProfileService>();
+            services.AddTransient<IClientService, ClientService>();
             //services.AddTransient<IResourceOwnerPasswordValidator, ApplicationUserPasswordValidator>();
 
             //Specification that IdentityServer going to be used with registration of required services
@@ -162,16 +164,6 @@ namespace AuthServerDemo
                 AuthenticationScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme,
                 AutomaticAuthenticate = false,
                 AutomaticChallenge = false
-            });
-
-            app.UseGoogleAuthentication(new GoogleOptions
-            {
-                AuthenticationScheme = "Google",
-                DisplayName = "Google",
-                SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme,
-
-                ClientId = "434483408261-55tc8n0cs4ff1fe21ea8df2o443v2iuc.apps.googleusercontent.com",
-                ClientSecret = "3gcoTrEDPPJ0ukn_aYYT6PWo"
             });
 
             app.UseFacebook(Configuration);

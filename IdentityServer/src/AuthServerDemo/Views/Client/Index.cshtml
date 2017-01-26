@@ -1,0 +1,28 @@
+﻿@using AuthServerDemo.Models.Client
+
+@model ShortClientInfoModel[]
+
+@{
+    ViewData["Title"] = "Clients List";
+}
+
+<a asp-controller="Client" asp-action="Register" class="navigationLink">Register</a>
+
+<div class="clearfix"></div>
+
+<ul class="list-group">
+    @foreach (ShortClientInfoModel client in Model)
+    {
+        <li class="list-group-item">
+            <a asp-controller="Client" asp-action="ProfileInfo" asp-route-id="@client.Id">@client.Name</a>
+            <a asp-controller="Client" asp-action="Delete" asp-route-id="@client.Id">
+                <span class="glyphicon glyphicon-remove delete" aria-hidden="true"></span>
+            </a>            
+        </li>
+    }
+</ul>
+
+@section scripts
+{
+    <script src="~/js/clients.js"></script>
+}

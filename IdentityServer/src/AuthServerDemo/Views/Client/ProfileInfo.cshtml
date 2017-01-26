@@ -1,0 +1,55 @@
+﻿@using AuthServerDemo.Models.Client
+
+@model ClientModel
+
+@{
+    ViewData["Title"] = "Profile Info";
+}
+
+<a asp-controller="Client" asp-action="Index" class="navigationLink">Back to List</a>
+
+<div class="clearfix"></div>
+
+<div class="form-horizontal">
+    <div class="form-group">
+        <label asp-for="ClientId" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="ClientId" class="form-control" disabled />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ClientName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="ClientName" class="form-control" disabled />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Secret" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="Secret" class="form-control" disabled />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="RedirectUri" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="RedirectUri" class="form-control" disabled />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LogOutRedirectUri" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="LogOutRedirectUri" class="form-control" disabled />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="GrantType" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input asp-for="GrantType" class="form-control" disabled />
+        </div>
+    </div>
+</div>

@@ -5,19 +5,22 @@ namespace AuthServerDemo.Models.Client
 {
     public class ClientModel
     {
-        [Required]
+        [Display(Name = "Client Id")]
         public string ClientId { get; set; }
 
+        [Display(Name = "Client Name")]
         public string ClientName { get; set; }
 
-        [Required]
         public string Secret { get; set; }
 
+        [Display(Name = "Redirect Uri")]
         public string RedirectUri { get; set; }
 
+        [Display(Name = "LogOut Redirect Uri")]
         public string LogOutRedirectUri { get; set; }
 
-        public IEnumerable<string> GrantTypes { get; set; }
+        [Display(Name = "Grant Type")]
+        public string GrantType { get; set; }
 
         public IEnumerable<string> AllowedScopes { get; set; }
     }
