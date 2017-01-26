@@ -66,7 +66,7 @@ namespace AuthServerDemo.Controllers
                     Secret = client.ClientSecrets?.FirstOrDefault()?.Value,
                     RedirectUri = client.RedirectUris?.FirstOrDefault()?.RedirectUri,
                     LogOutRedirectUri = client.LogoutUri,
-                    GrantType = client.AllowedGrantTypes?.FirstOrDefault()?.GrantType
+                    GrantType = client.AllowedGrantTypes?.Select(x => x.GrantType).Aggregate((i, j) => i + "; " + j)
                 };
             }
             else

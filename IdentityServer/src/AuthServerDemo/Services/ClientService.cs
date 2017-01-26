@@ -55,18 +55,52 @@ namespace AuthServerDemo.Services
                                                 Client = savedClient
                                             }
                                         };
-            savedClient.AllowedGrantTypes = new List<ClientGrantType>
-                                            {
-                                                new ClientGrantType
-                                                {
-                                                    GrantType = client.GrantType,
-                                                    Client = savedClient
-                                                }
-                                            };
+
+            savedClient.AllowedGrantTypes = GetClientGrantTypes(savedClient, client.GrantType);
 
             await context.SaveChangesAsync();
 
             return savedClient;
+        }
+
+        private List<ClientGrantType> GetClientGrantTypes(Client client, string grantType)
+        {
+            var result = new List<ClientGrantType>();
+
+            Func<string, ClientGrantType> convert = (x) => new ClientGrantType { GrantType = x, Client = client };
+
+            switch (grantType)
+            {
+                case nameof(GrantTypes.ClientCredentials):
+                    result.AddRange(GrantTypes.ClientCredentials.Select(convert));
+                    break;
+                case nameof(GrantTypes.Code):
+                    result.AddRange(GrantTypes.Code.Select(convert));
+                    break;
+                case nameof(GrantTypes.CodeAndClientCredentials):
+                    result.AddRange(GrantTypes.CodeAndClientCredentials.Select(convert));
+                    break;
+                case nameof(GrantTypes.Hybrid):
+                    result.AddRange(GrantTypes.Hybrid.Select(convert));
+                    break;
+                case nameof(GrantTypes.HybridAndClientCredentials):
+                    result.AddRange(GrantTypes.HybridAndClientCredentials.Select(convert));
+                    break;
+                case nameof(GrantTypes.Implicit):
+                    result.AddRange(GrantTypes.Implicit.Select(convert));
+                    break;
+                case nameof(GrantTypes.ImplicitAndClientCredentials):
+                    result.AddRange(GrantTypes.ImplicitAndClientCredentials.Select(convert));
+                    break;
+                case nameof(GrantTypes.ResourceOwnerPassword):
+                    result.AddRange(GrantTypes.ResourceOwnerPassword.Select(convert));
+                    break;
+                case nameof(GrantTypes.ResourceOwnerPasswordAndClientCredentials):
+                    result.AddRange(GrantTypes.ResourceOwnerPasswordAndClientCredentials.Select(convert));
+                    break;
+            }
+
+            return result;
         }
 
         public async Task<Client[]> GetAllAsync()
