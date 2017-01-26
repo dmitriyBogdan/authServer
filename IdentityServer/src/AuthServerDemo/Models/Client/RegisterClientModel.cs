@@ -14,10 +14,12 @@ namespace AuthServerDemo.Models.Client
         public string Secret { get; set; }
 
         [Required]
+        [DataType(DataType.Url)]
         [Display(Name = "Redirect Uri")]
         public string RedirectUri { get; set; }
 
         [Required]
+        [DataType(DataType.Url)]
         [Display(Name = "LogOut Redirect Uri")]
         public string LogOutRedirectUri { get; set; }
 

@@ -5,6 +5,7 @@ using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AuthServerDemo.Controllers
@@ -29,22 +30,32 @@ namespace AuthServerDemo.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterClientModel client)
+        public async Task<IActionResult> Register(RegisterClientModel model)
         {
             if (ModelState.IsValid)
             {
-                var savedClient = await clientService.CreateAsync(client);
+                var client = await clientService.CreateAsync(model);
 
-                RedirectToAction(nameof(ProfileInfo));
+                var info = new ClientModel
+                {
+                    ClientId = client.ClientId,
+                    ClientName = client.ClientName,
+                    Secret = client.ClientSecrets.First().Value,
+                    RedirectUri = client.RedirectUris.First().RedirectUri,
+                    LogOutRedirectUri = client.LogoutUri,
+                    GrantType = client.AllowedGrantTypes.First().GrantType
+                };
+                return RedirectToAction(nameof(ProfileInfo), info);
             }
 
-            return View(client);
+            return View(model);
         }
 
         [HttpGet]
-        public IActionResult ProfileInfo()
+        [AllowAnonymous]
+        public IActionResult ProfileInfo(ClientModel model)
         {
-            return View();
+            return View(model);
         }
     }
 }

@@ -7,18 +7,15 @@ namespace AuthServerDemo.Models.Client
     {
         public string ClientId { get; set; }
 
-        [Required]
         public string ClientName { get; set; }
 
         public string Secret { get; set; }
 
-        [Required]
         public string RedirectUri { get; set; }
 
-        [Required]
         public string LogOutRedirectUri { get; set; }
 
-        public IEnumerable<string> GrantTypes { get; set; }
+        public string GrantType { get; set; }
 
         public IEnumerable<string> AllowedScopes { get; set; }
     }
