@@ -1,4 +1,5 @@
 ﻿using AuthServerDemo.Attributes;
+using AuthServerDemo.Configuration;
 using AuthServerDemo.Models.Client;
 using AuthServerDemo.Services.Interfaces;
 using IdentityServer4.EntityFramework.Mappers;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 namespace AuthServerDemo.Controllers
 {
     [SecurityHeaders]
+    //[Authorize(Roles.Admin)]
     public class ClientController : Controller
     {
         private readonly IClientService clientService;
@@ -21,14 +23,21 @@ namespace AuthServerDemo.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        public async Task<IActionResult> Index()
+        {
+            var clients = await clientService.GetAllAsync();
+            var model = clients.Select(x => new ShortClientInfoModel { Id = x.Id, Name = x.ClientName }).ToArray();
+
+            return View(model);
+        }
+
+        [HttpGet]        
         public IActionResult Register()
         {
             return View(new RegisterClientModel());
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterClientModel model)
         {
@@ -36,26 +45,36 @@ namespace AuthServerDemo.Controllers
             {
                 var client = await clientService.CreateAsync(model);
 
-                var info = new ClientModel
-                {
-                    ClientId = client.ClientId,
-                    ClientName = client.ClientName,
-                    Secret = client.ClientSecrets.First().Value,
-                    RedirectUri = client.RedirectUris.First().RedirectUri,
-                    LogOutRedirectUri = client.LogoutUri,
-                    GrantType = client.AllowedGrantTypes.First().GrantType
-                };
-                return RedirectToAction(nameof(ProfileInfo), info);
+                return RedirectToAction(nameof(ProfileInfo), client.Id);
             }
 
             return View(model);
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ProfileInfo(ClientModel model)
+        public async Task<IActionResult> ProfileInfo(int id)
         {
+            var client = await clientService.GetByIdAsync(id);
+
+            var model = new ClientModel
+            {
+                ClientId = client.ClientId,
+                ClientName = client.ClientName,
+                Secret = client.ClientSecrets?.FirstOrDefault()?.Value,
+                RedirectUri = client.RedirectUris?.FirstOrDefault()?.RedirectUri,
+                LogOutRedirectUri = client.LogoutUri,
+                GrantType = client.AllowedGrantTypes?.FirstOrDefault()?.GrantType
+            };
+
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await clientService.DeleteByIdAsync(id);
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

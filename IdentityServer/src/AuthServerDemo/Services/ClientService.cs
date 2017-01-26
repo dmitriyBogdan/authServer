@@ -9,6 +9,8 @@ using Client = IdentityServer4.EntityFramework.Entities.Client;
 using ClientSecret = IdentityServer4.EntityFramework.Entities.ClientSecret;
 using ClientRedirectUri = IdentityServer4.EntityFramework.Entities.ClientRedirectUri;
 using ClientGrantType = IdentityServer4.EntityFramework.Entities.ClientGrantType;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthServerDemo.Services
 {
@@ -49,10 +51,30 @@ namespace AuthServerDemo.Services
                                                 new ClientGrantType { GrantType = client.GrantType }
                                             };
 
-            var createdClient = await context.AddAsync(clientDb);
+            var savedClient = await context.AddAsync(clientDb);
             await context.SaveChangesAsync();
 
-            return createdClient.Entity;
+            return savedClient.Entity;
+        }
+
+        public async Task<Client[]> GetAllAsync()
+        {
+            return await context.Clients.ToArrayAsync();
+        }
+
+        public async Task<Client> GetByIdAsync(int id)
+        {
+            return await context.Clients.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task DeleteByIdAsync(int id)
+        {
+            var client = await context.Clients.FirstOrDefaultAsync(x => x.Id == id);
+            if(client != null)
+            {
+                context.Clients.Remove(client);
+                await context.SaveChangesAsync();
+            }            
         }
     }
 }

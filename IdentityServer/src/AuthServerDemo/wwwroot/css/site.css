@@ -45,3 +45,7 @@
 .dropdown {
   height: 35px;
 }
+.delete {
+  float: right;
+  color: red;
+}
