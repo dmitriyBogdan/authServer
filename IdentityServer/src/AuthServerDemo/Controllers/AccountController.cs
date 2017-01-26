@@ -360,10 +360,14 @@ namespace AuthServerDemo.Controllers
                 }
             }
 
-            var name = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value;
+            var email = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;
+            var fullName = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value.Split(' ');
             var newUser = new ApplicationUser()
             {
-                UserName = name,
+                UserName = email,
+                FirstName = fullName[0],
+                LastName = fullName[1],
+                Email = email,
                 ProviderName = provider,
                 ProviderSubjectId = userId
             };
