@@ -45,7 +45,7 @@ namespace AuthServerDemo.Controllers
             {
                 var client = await clientService.CreateAsync(model);
 
-                return RedirectToAction(nameof(ProfileInfo), client.Id);
+                return RedirectToAction(nameof(ProfileInfo), new { id = client.Id });
             }
 
             return View(model);
@@ -54,17 +54,25 @@ namespace AuthServerDemo.Controllers
         [HttpGet]
         public async Task<IActionResult> ProfileInfo(int id)
         {
-            var client = await clientService.GetByIdAsync(id);
+            ClientModel model;
 
-            var model = new ClientModel
+            var client = await clientService.GetByIdAsync(id);
+            if(client != null)
             {
-                ClientId = client.ClientId,
-                ClientName = client.ClientName,
-                Secret = client.ClientSecrets?.FirstOrDefault()?.Value,
-                RedirectUri = client.RedirectUris?.FirstOrDefault()?.RedirectUri,
-                LogOutRedirectUri = client.LogoutUri,
-                GrantType = client.AllowedGrantTypes?.FirstOrDefault()?.GrantType
-            };
+                model = new ClientModel
+                {
+                    ClientId = client.ClientId,
+                    ClientName = client.ClientName,
+                    Secret = client.ClientSecrets?.FirstOrDefault()?.Value,
+                    RedirectUri = client.RedirectUris?.FirstOrDefault()?.RedirectUri,
+                    LogOutRedirectUri = client.LogoutUri,
+                    GrantType = client.AllowedGrantTypes?.FirstOrDefault()?.GrantType
+                };
+            }
+            else
+            {
+                model = new ClientModel();
+            }
 
             return View(model);
         }

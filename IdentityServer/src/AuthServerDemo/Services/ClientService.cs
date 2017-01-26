@@ -31,30 +31,42 @@ namespace AuthServerDemo.Services
 
             clientDb.ClientId = Guid.NewGuid().ToString().Replace("-", string.Empty);
             clientDb.ClientName = client.ClientName;
-            clientDb.ClientSecrets = new List<ClientSecret>
+            clientDb.LogoutUri = client.LogOutRedirectUri;
+
+            var savedClient = (await context.AddAsync(clientDb)).Entity;
+            await context.SaveChangesAsync();
+
+            savedClient.ClientSecrets = new List<ClientSecret>
                                         {
                                             new ClientSecret
                                             {
                                                 Description = secret.Description,
                                                 Expiration = secret.Expiration,
                                                 Type = secret.Type,
-                                                Value = secret.Value
+                                                Value = secret.Value,
+                                                Client = savedClient
                                             }
                                         };
-            clientDb.RedirectUris = new List<ClientRedirectUri>()
+            savedClient.RedirectUris = new List<ClientRedirectUri>()
                                         {
-                                            new ClientRedirectUri { RedirectUri = client.RedirectUri }
-                                        };
-            clientDb.LogoutUri = client.LogOutRedirectUri;
-            clientDb.AllowedGrantTypes = new List<ClientGrantType>
+                                            new ClientRedirectUri
                                             {
-                                                new ClientGrantType { GrantType = client.GrantType }
+                                                RedirectUri = client.RedirectUri,
+                                                Client = savedClient
+                                            }
+                                        };
+            savedClient.AllowedGrantTypes = new List<ClientGrantType>
+                                            {
+                                                new ClientGrantType
+                                                {
+                                                    GrantType = client.GrantType,
+                                                    Client = savedClient
+                                                }
                                             };
 
-            var savedClient = await context.AddAsync(clientDb);
             await context.SaveChangesAsync();
 
-            return savedClient.Entity;
+            return savedClient;
         }
 
         public async Task<Client[]> GetAllAsync()
@@ -64,7 +76,11 @@ namespace AuthServerDemo.Services
 
         public async Task<Client> GetByIdAsync(int id)
         {
-            return await context.Clients.FirstOrDefaultAsync(x => x.Id == id);
+            return await context.Clients
+                                .Include(x => x.ClientSecrets)
+                                .Include(x => x.RedirectUris)
+                                .Include(x => x.AllowedGrantTypes)
+                                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task DeleteByIdAsync(int id)
