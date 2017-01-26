@@ -166,32 +166,6 @@ namespace AuthServerDemo
                 AutomaticChallenge = false
             });
 
-            app.UseGoogleAuthentication(new GoogleOptions
-            {
-                AuthenticationScheme = "Google",
-                DisplayName = "Google",
-                SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme,
-
-                ClientId = "434483408261-55tc8n0cs4ff1fe21ea8df2o443v2iuc.apps.googleusercontent.com",
-                ClientSecret = "3gcoTrEDPPJ0ukn_aYYT6PWo"
-            });
-
-            app.UseOAuthAuthentication(new OAuthOptions
-            {
-                AuthenticationScheme = "LinkedIn",
-                DisplayName = "LinkedIn",
-                ClientId = "75xcbb4icwltx3",
-                ClientSecret = "giSng0gfq81DTUzZ",
-
-                CallbackPath = new PathString("/signin-linkedin"),
-
-                AuthorizationEndpoint = "https://www.linkedin.com/oauth/v2/authorization",
-                TokenEndpoint = "https://www.linkedin.com/oauth/v2/accessToken",
-                UserInformationEndpoint = "https://api.linkedin.com/v1/people/~:(id,formatted-name,email-address,picture-url)",
-
-                Scope = { "r_basicprofile", "r_emailaddress" },
-            });
-
             app.UseFacebook(Configuration);
 
             // Clears default claim types mapping 
