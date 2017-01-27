@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using AuthServerDemo.Data.Entities;
+@using AuthServerDemo.Configuration;
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -9,9 +10,18 @@
     <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
 
-            <li>
-                <a asp-area="" asp-controller="Client" asp-action="Index">Profile</a>
-            </li>
+            @if (!User.IsInRole(Roles.Admin))
+            {
+                <li>
+                    <a asp-area="" asp-controller="Account" asp-action="BecomeAdmin">+</a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a asp-area="" asp-controller="Client" asp-action="Index">Clients</a>
+                </li>
+            }            
             <li>
                 <a asp-area="" asp-controller="Client" asp-action="Index">Hello @UserManager.GetUserName(User)!</a>
             </li>
@@ -19,6 +29,7 @@
                 <button type="submit" class="btn btn-link navbar-btn navbar-link">Log off</button>
             </li>
         </ul>
+
     </form>
 }
 else

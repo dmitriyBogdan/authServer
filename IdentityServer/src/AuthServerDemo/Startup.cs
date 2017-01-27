@@ -151,6 +151,9 @@ namespace AuthServerDemo
                 app.ApplyMigrations(Configuration.IsMigrateDatabaseOnStatupWithTestingData());
             }
 
+            // Create roles for identity
+            app.InitRoles();
+
             // Enables Identity
             app.UseIdentity();
 

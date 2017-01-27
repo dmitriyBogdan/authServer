@@ -23,6 +23,7 @@ using AuthServerDemo.Data.Stores;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using AuthServerDemo.Configuration;
 
 namespace AuthServerDemo.Controllers
 {
@@ -300,6 +301,26 @@ namespace AuthServerDemo.Controllers
             }
 
             return Redirect("~/");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BecomeAdmin()
+        {
+            var user = await userManager.FindByEmailAsync(User.Identity.Name);
+            if(user != null)
+            {
+                var isAdmin = await userManager.IsInRoleAsync(user, Roles.Admin);
+                if(!isAdmin)
+                {
+                    var result = await userManager.AddToRoleAsync(user, Roles.Admin);
+                    if(result.Succeeded)
+                    {
+                        await signInManager.SignOutAsync();
+                    }
+                }                
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
