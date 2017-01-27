@@ -40,8 +40,9 @@ namespace AuthServerDemo.Controllers
                                 FirstName = user.FirstName,
                                 LastName = user.LastName,
                                 Address = user.Address,
-                                IsAdmin = user.IsAdmin
-                            });
+                    // The data is from memory or redis. We need to change the source first and admin determination then
+                    //IsAdmin = user.IsAdmin
+                });
             }
             catch (InvalidOperationException)
             {
@@ -62,7 +63,8 @@ namespace AuthServerDemo.Controllers
                         Address = model.Address,
                         FirstName = model.FirstName,
                         LastName = model.LastName,
-                        IsAdmin = model.IsAdmin
+                        // Do we need this method? I guess we have UI for it
+                        //IsAdmin = model.IsAdmin
                     };
 
                 var result = await userManager.CreateAsync(user, model.Password);
@@ -103,7 +105,8 @@ namespace AuthServerDemo.Controllers
                             FirstName = user.FirstName,
                             LastName = user.LastName,
                             Address = user.Address,
-                            IsAdmin = user.IsAdmin
+                            // Do we need this method? I guess we have UI for it
+                            //IsAdmin = user.IsAdmin
                         });
                     }                
                 }
