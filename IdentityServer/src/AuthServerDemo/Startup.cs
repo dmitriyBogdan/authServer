@@ -93,7 +93,7 @@ namespace AuthServerDemo
 
                 // Registration for Redis store implementation 
                 services.AddTransient<IApplicationUserRepository, ApplicationUserRedisRepository>();
-                services.AddTransient<IGrantRepository, GrantRedisRepository>();
+                services.AddTransient<IGrantRepository, GrantPostgreSqlRepository>();
             }
             else
             {
@@ -103,7 +103,7 @@ namespace AuthServerDemo
             }
 
             //Registration of custom implementation of interfaces that going to be injected and used during application execution
-            //services.AddTransient<IPersistedGrantStore, PersistedGrantRedisStore>();
+            services.AddTransient<IPersistedGrantStore, PersistedGrantPostgreSqlStore>();
             services.AddTransient<IProfileService, IdentityProfileService>();
             services.AddTransient<IClientService, ClientService>();
             //services.AddTransient<IResourceOwnerPasswordValidator, ApplicationUserPasswordValidator>();
@@ -150,6 +150,9 @@ namespace AuthServerDemo
             {
                 app.ApplyMigrations(Configuration.IsMigrateDatabaseOnStatupWithTestingData());
             }
+
+            // Create roles for identity
+            app.InitRoles();
 
             // Enables Identity
             app.UseIdentity();

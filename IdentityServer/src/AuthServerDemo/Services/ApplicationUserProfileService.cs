@@ -34,10 +34,11 @@ namespace AuthServerDemo.Services
                 claims.Add(new Claim(JwtClaimTypes.Address, user.Address));
                 claims.Add(new Claim(JwtClaimTypes.FamilyName, user.LastName));
 
-                if (user.IsAdmin)
+                // I guess it is not necessary to fix the class as the entire class is out of use. We should delete it
+                /*if (user.IsAdmin)
                 {
                     claims.Add(new Claim(JwtClaimTypes.Role, Roles.Admin));
-                }
+                }*/
 
                 claims.Add(new Claim(JwtClaimTypes.Role, Roles.User));
                 claims.Add(new Claim(JwtClaimTypes.Scope, InternalScope.Users));

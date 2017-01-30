@@ -35,7 +35,7 @@ namespace AuthServerDemo.Services
             claims.Add(new Claim(JwtClaimTypes.Address, user.Address));
             claims.Add(new Claim(JwtClaimTypes.FamilyName, user.LastName));
 
-            if (user.IsAdmin)
+            if (await this.userManager.IsInRoleAsync(user, Roles.Admin))
             {
                 claims.Add(new Claim(JwtClaimTypes.Role, Roles.Admin));
             }

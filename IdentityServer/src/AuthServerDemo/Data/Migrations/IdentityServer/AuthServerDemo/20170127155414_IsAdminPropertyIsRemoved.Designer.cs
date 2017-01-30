@@ -8,9 +8,10 @@ using AuthServerDemo.Data;
 namespace AuthServerDemo.Data.Migrations.IdentityServer.AuthServerDemo
 {
     [DbContext(typeof(AuthorizationServerDbContext))]
-    partial class AuthorizationServerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170127155414_IsAdminPropertyIsRemoved")]
+    partial class IsAdminPropertyIsRemoved
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752");

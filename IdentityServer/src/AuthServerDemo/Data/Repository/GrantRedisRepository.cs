@@ -1,6 +1,5 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer4.EntityFramework.Entities;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +49,7 @@ namespace AuthServerDemo.Data.Repository
             await connection.Database.KeyDeleteAsync(TOKEN + key);
         }
 
-        public async Task RemoveAsync(string subjectId, string clientId, string type)
+        public async Task RemoveAllAsync(string subjectId, string clientId, string type)
         {
             var allSubjects = await GetBySubjectAsync(subjectId);
             var subjectsToRemove = allSubjects.Where(x => x.SubjectId == subjectId && x.ClientId == clientId);
@@ -73,7 +72,7 @@ namespace AuthServerDemo.Data.Repository
             PersistedGrant result = null;
 
             var value = await connection.Database.StringGetAsync(TOKEN + key);
-            if(value.HasValue)
+            if (value.HasValue)
             {
                 result = JsonConvert.DeserializeObject<PersistedGrant>(value);
             }

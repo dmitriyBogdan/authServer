@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using IdentityServer4.Models;
 using System.Collections.Concurrent;
+using IdentityServer4.EntityFramework.Entities;
 
 namespace AuthServerDemo.Data.Repository.InAppMemoryRepository
 {
@@ -51,7 +50,7 @@ namespace AuthServerDemo.Data.Repository.InAppMemoryRepository
             return Task.FromResult(0);
         }
 
-        public Task RemoveAsync(string subjectId, string clientId, string type)
+        public Task RemoveAllAsync(string subjectId, string clientId, string type)
         {
             var grant = this.InMemoryPersistedGrant.First(q => q.Value.SubjectId == subjectId && q.Value.ClientId == clientId && q.Value.Type == type);
             PersistedGrant grantResult;

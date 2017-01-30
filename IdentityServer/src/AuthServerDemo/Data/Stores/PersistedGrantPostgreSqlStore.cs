@@ -1,59 +1,56 @@
-﻿using IdentityServer4.Stores;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using IdentityServer4.Models;
 using AuthServerDemo.Data.Repository;
+using IdentityServer4.Stores;
 using PersistedGrantEntity = IdentityServer4.EntityFramework.Entities.PersistedGrant;
 using PersistedGrantModel = IdentityServer4.Models.PersistedGrant;
-using System.Linq;
 
 namespace AuthServerDemo.Data.Stores
 {
-    public class PersistedGrantRedisStore : IPersistedGrantStore
+    public class PersistedGrantPostgreSqlStore : IPersistedGrantStore
     {
-        public IGrantRepository Tokens { get; private set; }
+        private readonly IGrantRepository repository;
 
-        public PersistedGrantRedisStore(IGrantRepository tokenConnections)
+        public PersistedGrantPostgreSqlStore(IGrantRepository repository)
         {
-            this.Tokens = tokenConnections;
+            this.repository = repository;
         }
 
-        public async Task StoreAsync(PersistedGrant grant)
+        public async Task StoreAsync(PersistedGrantModel grant)
         {
-            await Tokens.AddAsync(this.ModelToEntity(grant));
-        }
-
-        public async Task<PersistedGrant> GetAsync(string key)
-        {
-            try
-            {
-                return this.EntityToModel(await Tokens.GetByKeyAsync(key));
-            }
-            catch
-            {
-                return await Task.FromResult<PersistedGrant>(null);
-            }
-        }
-
-        public async Task<IEnumerable<PersistedGrant>> GetAllAsync(string subjectId)
-        {
-            var entities = await Tokens.GetBySubjectAsync(subjectId);
-            return entities.Select(this.EntityToModel);
-        }
-
-        public async Task RemoveAsync(string key)
-        {
-            await this.Tokens.RemoveAsync(key);
-        }
-
-        public async Task RemoveAllAsync(string subjectId, string clientId)
-        {
-            await this.Tokens.RemoveAllAsync(subjectId, clientId, null);
+            await this.repository.AddAsync(this.ModelToEntity(grant));
         }
 
         public async Task RemoveAllAsync(string subjectId, string clientId, string type)
         {
-            await this.Tokens.RemoveAllAsync(subjectId, clientId, type);
+            await this.repository.RemoveAllAsync(subjectId, clientId, type);
+        }
+
+        public async Task RemoveAllAsync(string subjectId, string clientId)
+        {
+            await this.repository.RemoveAllAsync(subjectId, clientId, null);
+        }
+
+        public async Task RemoveAsync(string key)
+        {
+            await this.repository.RemoveAsync(key);
+        }
+
+        public async Task<IEnumerable<PersistedGrantModel>> GetAllAsync(string subjectId)
+        {
+            var persistedGrantsList = new List<PersistedGrantModel>();
+            var entities = await this.repository.GetBySubjectAsync(subjectId);
+            foreach (var entity in entities)
+            {
+                persistedGrantsList.Add(this.EntityToModel(entity));
+            }
+
+           return persistedGrantsList;
+        }
+
+        public async Task<PersistedGrantModel> GetAsync(string key)
+        {
+            return this.EntityToModel(await this.repository.GetByKeyAsync(key));
         }
 
         private PersistedGrantModel EntityToModel(PersistedGrantEntity entity)

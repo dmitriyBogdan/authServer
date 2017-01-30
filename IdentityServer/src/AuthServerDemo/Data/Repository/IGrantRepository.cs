@@ -1,4 +1,4 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer4.EntityFramework.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,7 +10,7 @@ namespace AuthServerDemo.Data.Repository
 
         Task AddRangeAsync(IEnumerable<PersistedGrant> tokens);
 
-        Task RemoveAsync(string subjectId, string clientId, string type);
+        Task RemoveAllAsync(string subjectId, string clientId, string type);
 
         Task RemoveAsync(string key);
 
