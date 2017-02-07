@@ -291,9 +291,9 @@ namespace AuthServerDemo.Controllers
                 props = new AuthenticationProperties();
                 props.StoreTokens(new[] { new AuthenticationToken { Name = "id_token", Value = id_token } });
             }
-
-            await HttpContext.Authentication.SignInAsync(user.Id.ToString(), user.UserName, provider, props, additionalClaims.ToArray());
-            await HttpContext.Authentication.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            await signInManager.SignInAsync(user, isPersistent: false);
+            //await HttpContext.Authentication.SignInAsync(user.Id.ToString(), user.UserName, provider, props, additionalClaims.ToArray());
+            //await HttpContext.Authentication.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
 
             if (_interaction.IsValidReturnUrl(returnUrl))
             {
@@ -380,6 +380,12 @@ namespace AuthServerDemo.Controllers
                 {
                     filtered.Add(new Claim(JwtClaimTypes.Name, last));
                 }
+            }
+            else
+            {
+                var fullName = filtered.FirstOrDefault(x => x.Type == JwtClaimTypes.Name)?.Value;
+                first = fullName?.Split(' ')?[0];
+                last = fullName?.Split(' ')?[1];
             }
 
             var email = filtered.FirstOrDefault(c => c.Type == JwtClaimTypes.Email)?.Value;

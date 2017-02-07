@@ -170,6 +170,7 @@ namespace AuthServerDemo
             });
 
             app.UseFacebook(Configuration);
+            app.UseLinkedIn(Configuration);
 
             // Clears default claim types mapping 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
